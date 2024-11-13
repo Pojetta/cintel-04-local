@@ -41,5 +41,4 @@ python3 -m pip install --upgrade -r requirements.txt
 git add .
 git commit -m "Your commit message"
 git push -u origin main
-```# cintel-04-local
-
+```
