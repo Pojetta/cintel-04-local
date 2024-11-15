@@ -13,7 +13,7 @@ penguins = load_penguins()
 color_map = {
     "Adelie": "darkorange",  # Replacing the hex code with "darkorange"
     "Gentoo": "purple",      # Replacing the hex code with "purple"
-    "Chinstrap": "cyan4"     # Replacing the hex code with "cyan4"
+    "Chinstrap": "#1b7978"     # Replacing the hex code with "cyan4"
 }
 
 
@@ -75,7 +75,7 @@ with ui.nav_panel("Plots"):
                 data=filtered_data(),
                 x=input.selected_attribute(),
                 bins=input.seaborn_bin_count(), 
-                color = "#008C95"
+                color = "#1b7978"
             )
                 ax.set_title("Palmer Penguins")
                 ax.set_xlabel(input.selected_attribute())
