@@ -42,3 +42,6 @@ git add .
 git commit -m "Your commit message"
 git push -u origin main
 ```
+
+## Run the App in the Browser
+shiny run --reload --launch-browser penguins/app.py

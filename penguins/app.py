@@ -5,6 +5,7 @@ from shiny.express import input, ui, render
 from shinywidgets import render_widget, render_plotly
 import seaborn as sns
 
+
 # Load the penguins dataset
 penguins = load_penguins()
 
@@ -32,11 +33,11 @@ with ui.sidebar(
     )
 
     # Numeric input for Plotly histogram
-    ui.input_numeric("plotly_bin_count", "Bin Count (Plotly Histogram)", 50, min=1, max=100)
+    ui.input_numeric("plotly_bin_count", "Bin Count (Plotly Histogram)", 75, min=1, max=100)
 
     # Slider input for Seaborn
     ui.input_slider(
-        "seaborn_bin_count", "Bin Count (Seaborn Histogram)", 5, 100, 50
+        "seaborn_bin_count", "Bin Count (Seaborn Histogram)", 5, 100, 75
     )
 
     # Checkbox to filter species
@@ -62,59 +63,55 @@ with ui.sidebar(
 # Main content layout
 with ui.nav_panel("Plots"):
 
-    # Display the Penguins
-    with ui.card():
-        ui.card_header("Meet the Palmer Penguins")
-        # Display the image
-        ui.img(src="penguins.png", alt="Meet the Palmer Penguins";)
-        # Add the artist credit text under the image
-        ui.p("Artwork by @allison_horst", style="font-style: italic; font-size: 14px;")
+    with ui.layout_columns():
 
-    # Display the Plotly Histogram
-    with ui.card():
-        ui.card_header("Plotly Histogram")
-        @render_plotly
-        def plotly_histogram():
-            return px.histogram(
-                filtered_data(),
-                x=input.selected_attribute(),
-                nbins=input.plotly_bin_count(),
-                color="species",
-                color_discrete_map=color_map
-            )
-
-    # Display the Seaborn Histogram (showing all species)
-    with ui.card():
-        ui.card_header("Seaborn Histogram")
-        @render.plot
-        def seaborn_histogram():
-            ax = sns.histplot(
+        # Display the Seaborn Histogram (showing all species)
+        with ui.card(full_screen=True):
+            ui.card_header("Seaborn Histogram")
+            @render.plot
+            def seaborn_histogram():
+                ax = sns.histplot(
                 data=filtered_data(),
                 x=input.selected_attribute(),
                 bins=input.seaborn_bin_count(), 
                 color = "#008C95"
             )
-            ax.set_title("Palmer Penguins")
-            ax.set_xlabel(input.selected_attribute())
-            ax.set_ylabel("Count")
-            return ax
-
-    # Display the Plotly Scatterplot (showing selected species)
-    with ui.card(full_screen=True):
-        ui.card_header("Plotly Scatterplot: Species")
-        @render_plotly
-        def plotly_scatterplot():
-            return px.scatter(
-                data_frame=filtered_data(),  
-                x="body_mass_g",
-                y="bill_length_mm",
+                ax.set_title("Palmer Penguins")
+                ax.set_xlabel(input.selected_attribute())
+                ax.set_ylabel("Count")
+                return ax
+            
+    with ui.layout_columns():         
+    
+        # Display the Plotly Histogram
+        with ui.card(full_screen=True):
+            ui.card_header("Plotly Histogram")
+            @render_plotly
+            def plotly_histogram():
+                return px.histogram(
+                filtered_data(),
+                x=input.selected_attribute(),
+                nbins=input.plotly_bin_count(),
                 color="species",
-                labels={
-                    "bill_length_mm": "Bill Length (mm)",
-                    "body_mass_g": "Body Mass (g)",
-                },
                 color_discrete_map=color_map
-            )
+            )    
+
+        # Display the Plotly Scatterplot (showing selected species)
+        with ui.card(full_screen=True):
+            ui.card_header("Plotly Scatterplot")
+            @render_plotly
+            def plotly_scatterplot():
+                return px.scatter(
+                    data_frame=filtered_data(),  
+                    x="body_mass_g",
+                    y="bill_length_mm",
+                    color="species",
+                    labels={
+                        "bill_length_mm": "Bill Length (mm)",
+                        "body_mass_g": "Body Mass (g)",
+                    },
+                    color_discrete_map=color_map
+                )
         
 with ui.nav_panel("Data"): 
 
@@ -134,6 +131,16 @@ with ui.nav_panel("Data"):
         @render.data_frame
         def data_grid():
             return render.DataGrid(filtered_data())
+        
+with ui.nav_panel("Meet The Penguins"):
+    # Display the image
+    ui.img(
+        src="https://allisonhorst.github.io/palmerpenguins/reference/figures/lter_penguins.png",
+        alt="Meet the Palmer Penguins"
+        )
+    # Add the artist credit text under the image
+    ui.p("Artwork by @allison_horst", style="font-style: italic; font-size: 14px;")
+
 # --------------------------------------------------------
 # Reactive calculations and effects
 # --------------------------------------------------------
