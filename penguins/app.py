@@ -11,10 +11,11 @@ penguins = load_penguins()
 
 # Define a color map to fix specific colors for each species
 color_map = {
-    "Adelie": "#C964CF",  
-    "Gentoo": "#008C95",  
-    "Chinstrap": "#FFAA4D"   
+    "Adelie": "darkorange",  # Replacing the hex code with "darkorange"
+    "Gentoo": "purple",      # Replacing the hex code with "purple"
+    "Chinstrap": "cyan4"     # Replacing the hex code with "cyan4"
 }
+
 
 # Set up the UI options
 ui.page_opts(title="Pojetta and the Penguin Plots", fillable=True)
