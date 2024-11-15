@@ -1,12 +1,12 @@
 # cintel-04-local
 
-## Configure Git 
+### Configure Git 
 ```
 git config --global user.name "Your Name"
 git config --global user.email "youremail@example.com"
 ```
 
-## Verify Installations
+### Verify Installations
 ```
 python3 --version
 git --version
@@ -14,34 +14,41 @@ git config user.name
 git config user.email
 ```
 
-## Clone From Git
+### Clone From Git
 ```
 git clone https://github.com/Pojetta/cintel-04-local
 ```
 
-## Virtual Environment
-### Create: 
+### Virtual Environment
+#### Create: 
 ```
 python3 -m venv .venv
 ```
 
-### Activate
+#### Activate
 ```
 source .venv/bin/activate
 ```
 
-## Install Packages
+### Install Packages
 ```
 python3 -m pip install --upgrade pip setuptools
 python3 -m pip install --upgrade -r requirements.txt
 ```
 
-## Git Add, Commit, Push
+### Git Add, Commit, Push
 ```
 git add .
 git commit -m "Your commit message"
 git push -u origin main
 ```
 
-## Run the App in the Browser
+### Run your App Locally
 shiny run --reload --launch-browser penguins/app.py
+
+### Prepare your App for Deployment
+shiny static-assets remove
+shinylive export penguins docs
+
+### Serve the App
+python3 -m http.server --directory docs --bind localhost 8008
