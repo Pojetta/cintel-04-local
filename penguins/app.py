@@ -8,44 +8,44 @@ import seaborn as sns
 # Load the penguins dataset
 penguins = load_penguins()
 
+# Define a color map to fix specific colors for each species
+color_map = {
+    "Adelie": "#C964CF",  
+    "Gentoo": "#008C95",  
+    "Chinstrap": "#FFAA4D"   
+}
+
 # Set up the UI options
 ui.page_opts(title="Pojetta and the Penguin Plots", fillable=True)
 
-# Add a sidebar with input components
+# ADD A SIDEBAR
 with ui.sidebar(
-    position="right", bg="#e6b6e8", open="open"
-):
+    open="open"
+): 
+    ui.h2("Sidebar")  # Sidebar header
 
-    # Sidebar header
-    ui.h2("Sidebar")  
-    
-    # Checkbox to filter species plotly scatterplot
-    ui.input_checkbox_group(
-        "selected_species_list_scatterplot",
-        "Select a Species (Scatterplot)",
-        choices=["Adelie", "Gentoo", "Chinstrap"],
-        selected=["Adelie", "Gentoo", "Chinstrap"],
-        inline=False,
-    )
-
-    # Checkbox to filter plotly histogram species 
-    ui.input_checkbox_group(
-        "selected_species_list_histogram",
-        "Select a Species (Histogram)",
-        choices=["Adelie", "Gentoo", "Chinstrap"],
-        selected=["Adelie", "Gentoo", "Chinstrap"],
-        inline=False,
-    )
-    # Dropdown menu for histogram attribute
+    # Dropdown menu selected attribute
     ui.input_selectize(
         "selected_attribute",
-        "Histogram Attribute",
+        "Attributes",
         choices=["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"],
     )
 
-    # Slider input for plotly histogram bin count
+    # Numeric input for Plotly histogram
+    ui.input_numeric("plotly_bin_count", "Bin Count (Plotly Histogram)", 50, min=1, max=100)
+
+    # Slider input for Seaborn
     ui.input_slider(
-        "plotly_bin_count", "Histogram Bin Count", 5, 100, 50
+        "seaborn_bin_count", "Bin Count (Seaborn Histogram)", 5, 100, 50
+    )
+
+    # Checkbox to filter species
+    ui.input_checkbox_group(
+        "selected_species_list",
+        "Select a Species",
+        choices=["Adelie", "Gentoo", "Chinstrap"],
+        selected=["Adelie", "Gentoo", "Chinstrap"],
+        inline=False,
     )
 
     # Dividing line
@@ -54,81 +54,99 @@ with ui.sidebar(
     # Hyperlink to GitHub repo
     ui.h5("GitHub Repo")
     ui.a(
-        "cintel-03-data",
-        href="https://github.com/Pojetta/cintel-03-data",
+        "cintel-04-data",
+        href="https://github.com/Pojetta/cintel-04-data",
         target="_blank",
     )
 
 # Main content layout
 with ui.nav_panel("Plots"):
-    # Plotly Scatterplot (showing selected species)
+
+    # Display the Penguins
     with ui.card():
-        ui.card_header("Scatterplot")
+        ui.card_header("Meet the Palmer Penguins")
+        # Display the image
+        ui.img(src="penguins.png", alt="Meet the Palmer Penguins";)
+        # Add the artist credit text under the image
+        ui.p("Artwork by @allison_horst", style="font-style: italic; font-size: 14px;")
+
+    # Display the Plotly Histogram
+    with ui.card():
+        ui.card_header("Plotly Histogram")
+        @render_plotly
+        def plotly_histogram():
+            return px.histogram(
+                filtered_data(),
+                x=input.selected_attribute(),
+                nbins=input.plotly_bin_count(),
+                color="species",
+                color_discrete_map=color_map
+            )
+
+    # Display the Seaborn Histogram (showing all species)
+    with ui.card():
+        ui.card_header("Seaborn Histogram")
+        @render.plot
+        def seaborn_histogram():
+            ax = sns.histplot(
+                data=filtered_data(),
+                x=input.selected_attribute(),
+                bins=input.seaborn_bin_count(), 
+                color = "#008C95"
+            )
+            ax.set_title("Palmer Penguins")
+            ax.set_xlabel(input.selected_attribute())
+            ax.set_ylabel("Count")
+            return ax
+
+    # Display the Plotly Scatterplot (showing selected species)
+    with ui.card(full_screen=True):
+        ui.card_header("Plotly Scatterplot: Species")
         @render_plotly
         def plotly_scatterplot():
             return px.scatter(
-                data_frame=filtered_data_scatterplot(),  # Use scatterplot-specific filtered data
-                title="Pojetta's Palmer Penguins",
-                x="bill_length_mm",
-                y="body_mass_g",
+                data_frame=filtered_data(),  
+                x="body_mass_g",
+                y="bill_length_mm",
                 color="species",
                 labels={
                     "bill_length_mm": "Bill Length (mm)",
                     "body_mass_g": "Body Mass (g)",
                 },
-                color_discrete_sequence=["#C964CF", "#008C95", "#FFAA4D"],  # Custom colors for the scatterplot
+                color_discrete_map=color_map
             )
+        
+with ui.nav_panel("Data"): 
 
-    # Plotly Histogram
-    with ui.card():
-        ui.card_header("Histogram")
-        @render_plotly
-        def plotly_histogram():
-            return px.histogram(
-                data_frame=filtered_data_histogram(),  # Use histogram-specific filtered data
-                title="Pojetta's Palmer Penguins",
-                x=input.selected_attribute(),
-                nbins=input.plotly_bin_count(),
-                color="species",
-                color_discrete_sequence=["#C964CF", "#008C95", "#FFAA4D"],  # Custom colors for the histogram
-            ) 
-
-with ui.nav_panel("Tables"):    
-    # Display Data Table (showing all data)   
+    # Display Data Table (showing all data)
     with ui.card(full_screen=True):
         ui.card_header("Data Table")
+
         @render.data_frame
         def data_table():
-            return render.DataTable(penguins)
+            return render.DataTable(filtered_data())
+
 
     # Display Data Grid (showing all data)
     with ui.card(full_screen=True):
         ui.card_header("Data Grid")
+
         @render.data_frame
         def data_grid():
-            return render.DataGrid(penguins)
-    
+            return render.DataGrid(filtered_data())
 # --------------------------------------------------------
 # Reactive calculations and effects
 # --------------------------------------------------------
 
 # Add a reactive calculation to filter the data
 # By decorating the function with @reactive, we can use the function to filter the data
-# The function will be called whenever an input function used to generate that output changes.
+# The function will be called whenever an input functions used to generate that output changes.
 # Any output that depends on the reactive function (e.g., filtered_data()) will be updated when the data changes.
 
-# Filtered data for the scatterplot
-@reactive.calc
-def filtered_data_scatterplot():
-    selected_species_scatterplot = input.selected_species_list_scatterplot()
-    if selected_species_scatterplot:
-        return penguins[penguins['species'].isin(selected_species_scatterplot)]
-    return penguins
-
-# Filtered data for the histogram
-@reactive.calc
-def filtered_data_histogram():
-    selected_species_histogram = input.selected_species_list_histogram()
-    if selected_species_histogram:
-        return penguins[penguins['species'].isin(selected_species_histogram)]
-    return penguins
+# Reactive function to filter data
+@reactive.Calc
+def filtered_data():
+    selected_species = input.selected_species_list()
+    if selected_species:
+        return penguins[penguins['species'].isin(selected_species)]
+    return penguins  # Return all data if no species are selected
