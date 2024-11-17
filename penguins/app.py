@@ -16,9 +16,8 @@ color_map = {
     "Chinstrap": "#1b7978"     # Replacing the hex code with "cyan4"
 }
 
-
 # Set up the UI options
-ui.page_opts(title="Pojetta and the Penguin Plots", fillable=True)
+ui.page_opts(title="Pojetta and the Penguin Plots", full_width=True)
 
 # ADD A SIDEBAR
 with ui.sidebar(
